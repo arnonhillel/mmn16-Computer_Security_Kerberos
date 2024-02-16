@@ -30,8 +30,10 @@ def get_msg_srv_connection():
 
 def save_client_id_to_file(file_path, _id):
     try:
-        with open(file_path, 'a') as file:
-            file.write(_id + '\n')
+        with open(file_path, 'r+') as file:
+            content = file.read()
+            file.seek(0)
+            file.write(content + '\n' + _id)
         print("Client ID saved successfully.")
     except FileNotFoundError:
         print("Error: File not found.")
@@ -51,7 +53,7 @@ def register_or_load_data_from_me_info(file_path):
             _password = _password.encode('ascii')[:254] + b'\0'
 
             _id = bytes.fromhex(lines[1].strip()) if len(lines) > 1 else None
-            if _id is None:  # not None if client already registered
+            if _id is None or _id == b"":  # not None if client already registered
                 _id = register_client(get_auth_connection(), _name, _password)
                 if _id is not None:
                     save_client_id_to_file('me.info', _id.hex())
@@ -80,7 +82,7 @@ if __name__ == "__main__":
         # Request AES key and ticket from authentication service
         """ ***** Request Symmetric Key From Auth to communicate with Message Service  *****"""
         decrypted_aes_key_client_msg, ticket_bytes = request_key_and_ticket(get_auth_connection(), client_id,
-                                                                            password.decode(),
+                                                                    password.decode('utf-8').strip('\x00').strip("'"),
                                                                             server_id_bytes)
     except Exception as e:
         print(f"Error during communication with Authentication Service: {e}")

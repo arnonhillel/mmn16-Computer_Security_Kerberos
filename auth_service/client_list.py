@@ -48,7 +48,7 @@ class ClientList:
 
     def get_client_by_id(self, _id):
         for client in self.clients:
-            if client.ID == str(_id):
+            if client.ID == _id or client.ID == str(_id):
                 return client
         return None
 

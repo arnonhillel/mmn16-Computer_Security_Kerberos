@@ -73,7 +73,6 @@ def handle_symmetric_key_request(data, client_list, request_header):
             raise ValueError("Failed parsing request.")
         client_id = request.header.client_id
         aes_key = generate_aes_key()
-        print(f"*****----AES KEY: {aes_key}------***")
         response.client_id = client_id
         response.encrypted_key = get_client_encrypted_key(aes_key, client_list, client_id, request.nonce)
         response.ticket = get_server_ticket(aes_key, client_id)
