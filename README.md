@@ -65,17 +65,26 @@ mmn16-/
 
 ### 1. auth_service
 1. Navigate to the `auth_service` directory.
-2. Run the `main.py` script:
+2. Run the following command:
+    ```
+    python main.py
+    ```
 
 
 ### 2. msg_service
 1. Navigate to the `msg_service` directory.
-2. Run the `main.py` script:
+2. Run the following command:
+    ```
+    python main.py
+    ```
 
 ### 3. client
 1. Before running the client, ensure that both `auth_service` and `msg_service` are running.
 2. Navigate to the `client` directory.
-3. Run the `main.py` script:
+3. Run the following command:
+    ```
+    python main.py
+    ```
 
 ## Additional Notes
 - TODO
