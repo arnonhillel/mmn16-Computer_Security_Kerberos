@@ -1,5 +1,6 @@
 from utils import protocol
 from utils.authenticator import Authenticator
+from utils.encryption import decrypt_data
 from utils.string_util import base64_to_string
 from utils.ticket import Ticket
 import socket
@@ -55,7 +56,9 @@ def handle_send_symmetric_key_request(data, request_header):
             raise ValueError("Failed parsing request.")
         # authenticator = Authenticator.unpack(request.authenticator, base64_to_string(msg_server_info.key))
         ticket = Ticket.unpack(request.ticket, base64_to_string(msg_server_info.key))
-        # # TODO decrypt ticket and authenticator
+        decrypted_aes_key = decrypt_data(ticket.aes_key, base64_to_string(msg_server_info.key), ticket.ticket_iv)
+        print(decrypted_aes_key)
+        # # TODO decrypt authenticator with decrypted_aes_key
         # if is_valid_authenticator(authenticator) and is_valid_ticket(ticket):
         #     return response.pack()
         return response.pack()

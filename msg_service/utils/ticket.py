@@ -21,14 +21,6 @@ class Ticket:
         else:
             self.expiration_time = self.creation_time + timedelta(hours=1)
 
-    def pack(self):
-        creation_time_bytes = int(self.creation_time.timestamp()).to_bytes(8, byteorder='big')
-        expiration_time_bytes = int(self.expiration_time.timestamp()).to_bytes(8, byteorder='big')
-
-        return b''.join(
-            [self.version, self.client_id, self.server_id, creation_time_bytes, self.ticket_iv, self.aes_key,
-             expiration_time_bytes])
-
     @classmethod
     def unpack(cls, data, aes_key):
         version = data[0]

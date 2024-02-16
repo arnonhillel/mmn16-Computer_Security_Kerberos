@@ -50,8 +50,7 @@ def encrypt_data(data, encryption_key):
 def decrypt_data(encrypted_data, encryption_key, iv):
     cipher = AES.new(encryption_key, AES.MODE_CBC, iv)
     decrypted_data = cipher.decrypt(encrypted_data)
-    un_padded_data = unpad(decrypted_data)
-    return un_padded_data
+    return decrypted_data
 
 
 def pad_message(message):

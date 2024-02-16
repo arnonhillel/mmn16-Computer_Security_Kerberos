@@ -29,15 +29,15 @@ class Ticket:
             [self.version, self.client_id, self.server_id, creation_time_bytes, self.ticket_iv, self.aes_key,
              expiration_time_bytes])
 
-    @classmethod
-    def unpack(cls, data, aes_key):
-        version = data[0]
-        client_id = data[1:17]
-        server_id = data[17:33]
-        creation_time_bytes = data[33:41]
-        creation_time = int.from_bytes(creation_time_bytes, byteorder='big')
-        ticket_iv = data[41:57]
-        aes_key = data[57:89]
-        expiration_time_bytes = data[89:]
-        expiration_time = int.from_bytes(expiration_time_bytes, byteorder='big')
-        return cls(version, client_id, server_id.hex(), ticket_iv, aes_key, creation_time, expiration_time)
+    # @classmethod
+    # def unpack(cls, data, aes_key):
+    #     version = data[0]
+    #     client_id = data[1:17]
+    #     server_id = data[17:33]
+    #     creation_time_bytes = data[33:41]
+    #     creation_time = int.from_bytes(creation_time_bytes, byteorder='big')
+    #     ticket_iv = data[41:57]
+    #     aes_key = data[57:89]
+    #     expiration_time_bytes = data[89:]
+    #     expiration_time = int.from_bytes(expiration_time_bytes, byteorder='big')
+    #     return cls(version, client_id, server_id.hex(), ticket_iv, aes_key, creation_time, expiration_time)
