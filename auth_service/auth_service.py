@@ -4,7 +4,6 @@ from datetime import datetime
 
 from utils.protocol import PROTOCOL_VERSION
 from utils.ticket import Ticket
-from server_list import load_msg_info
 from utils import protocol
 from utils.encryption import generate_aes_key, encrypt_aes_key_and_nonce, get_encryption_key, encrypt_aes_key
 from utils.string_util import base64_to_string
@@ -96,10 +95,8 @@ def get_client_encrypted_key(aes_key, client_list, client_id, nonce):
 
 
 def get_server_ticket(aes_key, client_id):
-    msg_server_info = load_msg_info()
     server_version = PROTOCOL_VERSION
-    encrypted_aes_key_for_server, server_iv = encrypt_aes_key(aes_key, base64_to_string(msg_server_info.key))
-    ticket = Ticket(server_version, client_id, msg_server_info.server_id, server_iv, encrypted_aes_key_for_server)
+    ticket = Ticket(server_version, client_id, aes_key)
     return ticket.pack()
 
 

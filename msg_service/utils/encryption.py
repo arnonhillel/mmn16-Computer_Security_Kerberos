@@ -22,14 +22,14 @@ def get_encryption_key(hashed_password):
     return encryption_key
 
 
-def encrypt_aes_key_and_nonce(aes_key, encryption_key, nonce):
-    iv = get_random_bytes(IV_SIZE)
-    cipher = AES.new(encryption_key, AES.MODE_CBC, iv=iv)
-    nonce = pad_message(nonce)
-    encrypted_nonce = cipher.encrypt(nonce)
-    encrypted_aes_key = cipher.encrypt(aes_key)
-    packed_data = iv + encrypted_nonce + encrypted_aes_key
-    return packed_data
+# def encrypt_aes_key_and_nonce(aes_key, encryption_key, nonce):
+#     iv = get_random_bytes(IV_SIZE)
+#     cipher = AES.new(encryption_key, AES.MODE_CBC, iv=iv)
+#     nonce = pad_message(nonce)
+#     encrypted_nonce = cipher.encrypt(nonce)
+#     encrypted_aes_key = cipher.encrypt(aes_key)
+#     packed_data = iv + encrypted_nonce + encrypted_aes_key
+#     return packed_data
 
 
 def encrypt_aes_key(aes_key, encryption_key):
@@ -50,13 +50,13 @@ def encrypt_data(data, encryption_key):
 def decrypt_data(encrypted_data, encryption_key, iv):
     cipher = AES.new(encryption_key, AES.MODE_CBC, iv)
     decrypted_data = cipher.decrypt(encrypted_data)
-    return decrypted_data
+    return unpad(decrypted_data)
 
 
-def pad_message(message):
-    padding_length = AES.block_size - (len(message) % AES.block_size)
-    padded_message = message + bytes([padding_length] * padding_length)
-    return padded_message
+# def pad_message(message):
+#     padding_length = AES.block_size - (len(message) % AES.block_size)
+#     padded_message = message + bytes([padding_length] * padding_length)
+#     return padded_message
 
 
 def unpad(data):

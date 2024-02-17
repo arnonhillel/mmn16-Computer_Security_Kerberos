@@ -7,6 +7,8 @@ import socket
 import threading
 from utils.protocol import CLIENT_ID_SIZE, VERSION_SIZE, CODE_SIZE, PAYLOAD_SIZE, RequestHeader
 
+client_data = {}
+
 
 def print_banner(param, code, name):
     banner = f"--------------{param}: {code}({name})----------"
@@ -54,13 +56,19 @@ def handle_send_symmetric_key_request(data, request_header):
         msg_server_info = load_msg_info()
         if not request.unpack(data):
             raise ValueError("Failed parsing request.")
-        # authenticator = Authenticator.unpack(request.authenticator, base64_to_string(msg_server_info.key))
-        ticket = Ticket.unpack(request.ticket, base64_to_string(msg_server_info.key))
-        decrypted_aes_key = decrypt_data(ticket.aes_key, base64_to_string(msg_server_info.key), ticket.ticket_iv)
-        print(decrypted_aes_key)
-        # # TODO decrypt authenticator with decrypted_aes_key
+        # Get Ticket
+        ticket = Ticket()
+        ticket.unpack(request.ticket, base64_to_string(msg_server_info.key))
+        # get authenticator
+        authenticator = Authenticator()
+        authenticator.unpack(request.authenticator, ticket.aes_key)
+        # # TODO validator
         # if is_valid_authenticator(authenticator) and is_valid_ticket(ticket):
         #     return response.pack()
+        client_data[request.header.client_id.hex()] = {
+            'ticket': ticket,
+            'authenticator': authenticator
+        }
         return response.pack()
     except ValueError as ve:
         print(f"Registration Request: {ve}")
@@ -75,12 +83,30 @@ def handle_message_from_client_request(data, request_header):
         if not request.unpack(data):
             raise ValueError("Failed parsing request.")
         # TODO decrypt message
-        print(f"{request.header.client_id} message: {request.message_content}")
+        get_decrypted_client_message_and_print(request.header.client_id.hex(), request.message_content, request.message_iv)
         return response.pack()
     except ValueError as ve:
         print(f"Registration Request: {ve}")
         response.header.code = protocol.EResponseCodeMsgService.RESPONSE_SERVER_ERROR.value
         return response.pack()
+
+
+def get_decrypted_client_message_and_print(client_id, message_content, iv):
+    try:
+        client_ticket = client_data[client_id]
+        ticket = client_ticket['ticket']
+        authenticator = client_ticket['authenticator']
+        # Example decryption code
+        decrypted_message = decrypt_data(message_content, ticket.aes_key, iv)
+
+        # Print decrypted message
+        print(f"New Message From Client: id: {client_id}:\n'{decrypted_message.decode('utf-8')}'")
+
+    except KeyError:
+        print("Client does not exist in client_data")
+    except Exception as e:
+        print(f"error with get_decrypted_client_message_and_print function \nError - {e}")
+    return None
 
 
 ERequestCode = protocol.ERequestCodeMsgService

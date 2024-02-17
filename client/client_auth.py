@@ -61,7 +61,7 @@ def request_key_and_ticket(connection, client_id, password, server_id_bytes):
             encrypted_key_bytes = connection.receive_data(encrypted_key_size)
             decrypted_aes_key_client_msg = get_decrypted_aes_key(encrypted_key_bytes, password)
             # Ticket data
-            ticket_size = protocol.TICKET_SIZE  # 1 + 16 + 16 + 8 + 16 + 32 + 8
+            ticket_size = protocol.TICKET_SIZE  # 1 + 16 + 16 + 8 + 16 + 32 + 8 + 8(padding)
             ticket_bytes = connection.receive_data(ticket_size)
             return decrypted_aes_key_client_msg, ticket_bytes
         if res_code == EResponseCode.RESPONSE_REGISTRATION_ERROR.value:  # 1601:

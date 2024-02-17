@@ -48,11 +48,11 @@ def encrypt_data(data, encryption_key):
     return encrypted_aes_key, iv
 
 
-def decrypt_data(encrypted_data, encryption_key, iv):
-    cipher = AES.new(encryption_key, AES.MODE_CBC, iv)
-    decrypted_data = cipher.decrypt(encrypted_data)
-    un_padded_data = unpad(decrypted_data)
-    return un_padded_data
+# def decrypt_data(encrypted_data, encryption_key, iv):
+#     cipher = AES.new(encryption_key, AES.MODE_CBC, iv)
+#     decrypted_data = cipher.decrypt(encrypted_data)
+#     un_padded_data = unpad(decrypted_data)
+#     return un_padded_data
 
 
 def pad_message(message):
@@ -61,10 +61,10 @@ def pad_message(message):
     return padded_message
 
 
-def unpad(data):
-    padding_length = data[-1]  # Get the last byte, which represents the padding length
-    unpadded_data = data[:-padding_length]  # Remove the padding from the data
-    return unpadded_data
+# def unpad(data):
+#     padding_length = data[-1]  # Get the last byte, which represents the padding length
+#     unpadded_data = data[:-padding_length]  # Remove the padding from the data
+#     return unpadded_data
 
 
 def decrypt_aes_key(iv, encrypted_nonce, encrypted_aes_key, encryption_key):
