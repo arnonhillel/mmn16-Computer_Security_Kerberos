@@ -4,8 +4,23 @@
 `Arnon Hillel & Alon Nissim`
 
 
-## Introduction
-This project contains three services: `auth_service`, `client`, and `msg_service`. This README provides instructions on how to run each service separately.
+## Introduction - Kerberos Implementation
+This project implements a simplified version of the Kerberos protocol, consisting of three services: auth_service, client, and msg_service.
+- `auth_service` This service manages user registration and issues tickets for authentication purposes.
+- `client` The client component interacts with the auth_service to acquire authentication tickets and securely communicates with the msg_service.
+- `msg_service` The message service acts as a printing server. It receives authentication requests and encrypted messages from clients, decrypts them using tickets obtained from the auth_service, and displays them on the screen.
+
+# Overview 
+- `Client --> auth_service: IDs, Nonce`
+- `auth_service --> Client: EKc(Kc,s, Nonce), Ticket`
+- `Client -->msg_service: Ticket, Authenticator`
+- `msg_service -->Client: KeyAck`
+- `Client --> msg_service: EKc,s(Message)`
+- `msg_service -->Client: MsgAck`
+
+This document serves as a guide for setting up and running each service independently,
+providing clear instructions to ensure smooth execution and comprehension of the project's functionality.
+
 
 ## Prerequisites
 - Python 3.x installed on your system
@@ -17,7 +32,6 @@ This project contains three services: `auth_service`, `client`, and `msg_service
 mmn16-/
 |-- auth_service/
 |   |-- utils/
-|   |   |-- authenticator.py
 |   |   |-- encryption.py
 |   |   |-- protocol.py
 |   |   |-- string_util.txt
@@ -29,7 +43,19 @@ mmn16-/
 |   |-- msg.info
 |   |-- port.info
 |   |-- server_list.py
-
+|
+|-- client/
+|   |-- utils/
+|   |   |-- authenticator.py
+|   |   |-- encryption.py
+|   |   |-- protocol.py
+|   |   |-- string_util.txt
+|   |-- client.py
+|   |-- client_auth.py
+|   |-- client_msg.py
+|   |-- connection.py
+|   |-- me.info
+|   |-- srv.info
 |
 |-- msg_service/
 |   |-- utils/
@@ -43,20 +69,6 @@ mmn16-/
 |   |-- msg.info.py
 |   |-- msg.info
 |   |-- port.info
-|
-|-- client/
-|   |-- utils/
-|   |   |-- authenticator.py
-|   |   |-- encryption.py
-|   |   |-- protocol.py
-|   |   |-- string_util.txt
-|   |   |-- ticket.py
-|   |-- client.py
-|   |-- client_auth.py
-|   |-- client_msg.py
-|   |-- connection.py
-|   |-- me.info
-|   |-- srv.info
 |
 |-- README.md
 ```
@@ -85,6 +97,3 @@ mmn16-/
     ```
     python main.py
     ```
-
-## Additional Notes
-- TODO
