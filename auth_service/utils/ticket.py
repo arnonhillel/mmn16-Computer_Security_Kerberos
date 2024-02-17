@@ -1,9 +1,7 @@
 from datetime import datetime, timedelta
 
-# from utils.encryption import decrypt_data
 from server_list import load_msg_info
 from utils.encryption import encrypt_data
-from utils.protocol import VERSION_SIZE
 from utils.string_util import base64_to_string
 
 
@@ -32,16 +30,3 @@ class Ticket:
         return b''.join(
             [self.version, self.client_id, self.server_id, creation_time_bytes, self.ticket_iv,
              self.encrypted_aes_and_expiration])
-
-    # @classmethod
-    # def unpack(cls, data, aes_key):
-    #     version = data[0]
-    #     client_id = data[1:17]
-    #     server_id = data[17:33]
-    #     creation_time_bytes = data[33:41]
-    #     creation_time = int.from_bytes(creation_time_bytes, byteorder='big')
-    #     ticket_iv = data[41:57]
-    #     aes_key = data[57:89]
-    #     expiration_time_bytes = data[89:]
-    #     expiration_time = int.from_bytes(expiration_time_bytes, byteorder='big')
-    #     return cls(version, client_id, server_id.hex(), ticket_iv, aes_key, creation_time, expiration_time)

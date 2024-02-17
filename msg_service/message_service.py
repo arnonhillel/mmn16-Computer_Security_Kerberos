@@ -3,9 +3,6 @@ from utils.authenticator import Authenticator
 from utils.encryption import decrypt_data
 from utils.string_util import base64_to_string
 from utils.ticket import Ticket
-import socket
-import threading
-from utils.protocol import CLIENT_ID_SIZE, VERSION_SIZE, CODE_SIZE, PAYLOAD_SIZE, RequestHeader
 
 client_data = {}
 
@@ -72,7 +69,7 @@ def handle_send_symmetric_key_request(data, request_header):
         return response.pack()
     except ValueError as ve:
         print(f"Registration Request: {ve}")
-        response.header.code = protocol.EResponseCode.RESPONSE_REGISTRATION_ERROR.value
+        response.header.code = protocol.EResponseCodeMsgService.RESPONSE_SERVER_ERROR.value
         return response.pack()
 
 

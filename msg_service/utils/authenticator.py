@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from utils.encryption import encrypt_data, decrypt_data
+from utils.encryption import decrypt_data
 
 
 class Authenticator:

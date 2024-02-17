@@ -11,21 +11,14 @@ def generate_nonce():
 
 
 def register_client(connection, user_name, password):
-    client_id = b''
-    version = protocol.PROTOCOL_VERSION
-    req_code = ERequestCode.REQUEST_CLIENT_REGISTRATION.value  # 1024
-    payload = user_name + password
-    # Calculate the payload size
-    payload_size = len(payload)
-    # Pack the header
-    header = struct.pack("<16sBHL", client_id, version, req_code, payload_size)
+    request_header, request_payload = get_header_and_payload_for_register_client_request(user_name,password)
     # Combine the header and payload
-    message = header + payload
-    connection.send_data(message)
+    request = request_header + request_payload
+    connection.send_data(request)
     # Send the combined message (header + payload)
     header_data = connection.receive_data(protocol.HEADER_SIZE)
     # Unpack the header to get the payload size
-    header_format = "<BHL"  # Adjust this format according to your header structure
+    header_format = "<BHL"
     res_version, res_code, res_payload_size = struct.unpack(header_format, header_data)
     # Receive the payload based on the calculated payload size
     client_id = connection.receive_data(res_payload_size)
@@ -37,38 +30,56 @@ def register_client(connection, user_name, password):
         return None
 
 
+def get_header_and_payload_for_register_client_request(user_name, password):
+    client_id = b''
+    version = protocol.PROTOCOL_VERSION
+    req_code = ERequestCode.REQUEST_CLIENT_REGISTRATION.value  # 1024
+    request_payload = user_name + password
+    # Calculate the payload size
+    payload_size = len(request_payload)
+    # Pack the header
+    request_header = struct.pack("<16sBHL", client_id, version, req_code, payload_size)
+    return request_header, request_payload
+
+
 def request_key_and_ticket(connection, client_id, password, server_id_bytes):
     try:
-        version = protocol.PROTOCOL_VERSION  # Version (1 byte)
-        req_code = ERequestCode.REQUEST_SYMMETRIC_KEY.value  # 1027 # Request code (2 bytes)
-        nonce = generate_nonce()
-        request_payload = server_id_bytes + b'\0' + nonce
-        payload_size = len(request_payload)
-        request_header = struct.pack("<16sBHL", client_id, version, req_code, payload_size)  # Pack the header
+        request_header, request_payload = get_header_and_payload_for_key_and_ticket_request(client_id, server_id_bytes)
         request_message = request_header + request_payload
         connection.send_data(request_message)
+
         header_data = connection.receive_data(7)  # Receive the header
         # Unpack the header to get the payload size
-        header_format = "<BHL"  # Adjust this format according to your header structure
+        header_format = "<BHL"
         res_version, res_code, res_payload_size = struct.unpack(header_format, header_data)
 
         if res_code == EResponseCode.RESPONSE_SYMMETRIC_KEY.value:  # 1603:
             # client id
             client_id_from_auth_server = connection.receive_data(protocol.CLIENT_ID_SIZE)
-            print(f"client_id_from_auth_server: {client_id_from_auth_server}")
-            # encrypted_key
-            encrypted_key_size = protocol.IV_SIZE + protocol.ENCRYPTED_NONCE_SIZE + protocol.AES_KEY_SIZE  # 16+16+32
-            encrypted_key_bytes = connection.receive_data(encrypted_key_size)
-            decrypted_aes_key_client_msg = get_decrypted_aes_key(encrypted_key_bytes, password)
-            # Ticket data
-            ticket_size = protocol.TICKET_SIZE  # 1 + 16 + 16 + 8 + 16 + 32 + 8 + 8(padding)
-            ticket_bytes = connection.receive_data(ticket_size)
-            return decrypted_aes_key_client_msg, ticket_bytes
+            if client_id_from_auth_server == client_id:
+                # encrypted_key
+                encrypted_key_size = protocol.IV_SIZE + protocol.ENCRYPTED_NONCE_SIZE + protocol.AES_KEY_SIZE  # 16+16+32
+                encrypted_key_bytes = connection.receive_data(encrypted_key_size)
+                decrypted_aes_key_client_msg = get_decrypted_aes_key(encrypted_key_bytes, password)
+                # Ticket data
+                ticket_size = protocol.TICKET_SIZE  # 1 + 16 + 16 + 8 + 16 + 32 + 8 + 8(padding)
+                ticket_bytes = connection.receive_data(ticket_size)
+                return decrypted_aes_key_client_msg, ticket_bytes
         if res_code == EResponseCode.RESPONSE_REGISTRATION_ERROR.value:  # 1601:
             print(f"request key failed... client id: {client_id}")
     except Exception as e:
         print(f"request_key_and_ticket :{e}")
     return None, None
+
+
+def get_header_and_payload_for_key_and_ticket_request(client_id, server_id_bytes):
+    version = protocol.PROTOCOL_VERSION  # Version (1 byte)
+    req_code = ERequestCode.REQUEST_SYMMETRIC_KEY.value  # 1027 # Request code (2 bytes)
+    nonce = generate_nonce()
+    request_payload = server_id_bytes + b'\0' + nonce
+    payload_size = len(request_payload)
+    request_header = struct.pack("<16sBHL", client_id, version, req_code, payload_size)
+    return request_header, request_payload
 
 
 def get_decrypted_aes_key(encrypted_key_bytes, password):
@@ -80,8 +91,3 @@ def get_decrypted_aes_key(encrypted_key_bytes, password):
                                                          encryption_key)
     # TODO validate nonce
     return decrypted_aes_key
-
-# unpack ticket
-# format_string = '>B16s16sQ16s32sQ'
-# version, _id, server_id, creation_time, ticket_iv, aes_key, expiration_time = struct.unpack(format_string,
-#                                                                                             ticket_bytes)

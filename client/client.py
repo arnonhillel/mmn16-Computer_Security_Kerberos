@@ -75,11 +75,9 @@ if __name__ == "__main__":
         """
         Communication with Authentication Service
         """
-        # Convert MSG_SERVER_ID to bytes
         server_id_bytes = bytes.fromhex(MSG_SERVER_ID)
         """ ***** Register or Load data from 'me.info' file if user already registered.  *****"""
         name, password, client_id = register_or_load_data_from_me_info('me.info')
-        # Request AES key and ticket from authentication service
         """ ***** Request Symmetric Key From Auth to communicate with Message Service  *****"""
         decrypted_aes_key_client_msg, ticket_bytes = request_key_and_ticket(get_auth_connection(), client_id,
                                                                     password.decode('utf-8').strip('\x00').strip("'"),
@@ -94,22 +92,27 @@ if __name__ == "__main__":
             """ ***** Send Encrypted Symmetric Key  *****"""
             if decrypted_aes_key_client_msg is not None and ticket_bytes is not None:
                 # Create and pack authenticator
-                authenticator = Authenticator(protocol.PROTOCOL_VERSION, client_id, server_id_bytes, None)
+                authenticator = Authenticator(protocol.PROTOCOL_VERSION, client_id, server_id_bytes)
                 authenticator_bytes = authenticator.pack(decrypted_aes_key_client_msg)
+
                 # Send symmetric key to message service
                 is_symmetric_key_sent = send_symmetric_key(get_msg_srv_connection(), client_id, authenticator_bytes,
                                                            ticket_bytes)
+
                 if is_symmetric_key_sent:
                     print('Symmetric key sent successfully.')
-
-                    """ ***** Send Encrypted Message *****"""
-                    message = input("Enter your message: ")
-                    is_message_sent = send_message_to_msg_server(get_msg_srv_connection(), client_id,
-                                                                 message.encode('utf-8'), decrypted_aes_key_client_msg)
-                    if is_message_sent:
-                        print('Message Sent successfully.')
-                    else:
-                        print('Failed to send Message.')
+                    while True:
+                        """ ***** Send Encrypted Message *****"""
+                        message = input("Enter your message (type 'exit' to quit): ")
+                        if message.lower() == 'exit':
+                            print('Exiting...')
+                            break
+                        is_message_sent = send_message_to_msg_server(get_msg_srv_connection(), client_id,
+                                                                     message.encode('utf-8'), decrypted_aes_key_client_msg)
+                        if is_message_sent:
+                            print('Message Sent successfully.')
+                        else:
+                            print('Failed to send Message.')
 
                 else:
                     print('Failed to send symmetric key.')

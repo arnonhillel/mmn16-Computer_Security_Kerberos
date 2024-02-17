@@ -5,8 +5,7 @@ from datetime import datetime
 from utils.protocol import PROTOCOL_VERSION
 from utils.ticket import Ticket
 from utils import protocol
-from utils.encryption import generate_aes_key, encrypt_aes_key_and_nonce, get_encryption_key, encrypt_aes_key
-from utils.string_util import base64_to_string
+from utils.encryption import generate_aes_key, encrypt_aes_key_and_nonce, get_encryption_key
 
 
 def print_banner(param, code, name):

@@ -1,5 +1,4 @@
 import struct
-
 from enum import Enum
 
 # Header
@@ -44,22 +43,6 @@ code_to_request_mapping = {
 
 
 # Request Codes
-class ERequestCode(Enum):
-    REQUEST_CLIENT_REGISTRATION = 1024
-    REQUEST_SERVER_REGISTRATION = 1025
-    REQUEST_MESSAGE_SERVERS_LIST = 1026
-    REQUEST_SYMMETRIC_KEY = 1027
-
-
-# Responses Codes
-class EResponseCode(Enum):
-    RESPONSE_REGISTRATION_OK = 1600
-    RESPONSE_REGISTRATION_ERROR = 1601
-    RESPONSE_MESSAGE_SERVERS_LIST = 1602
-    RESPONSE_SYMMETRIC_KEY = 1603
-
-
-# Request Codes
 class ERequestCodeMsgService(Enum):
     REQUEST_SYMMETRIC_KEY = 1028
     REQUEST_SEND_MESSAGE = 1029
@@ -94,78 +77,11 @@ class ResponseHeader:
             return b""
 
 
-# code 1024
-class ClientRegistrationRequest:
-    def __init__(self, request_header):
-        self.header = request_header
-        self.name = b""  # 255 bytes
-        self.password = b""  # 255 bytes
-
-    def unpack(self, data):
-        try:
-            null_terminator = b'\x00'
-            name_data, *other_data = data.split(null_terminator)
-            password_data = b''.join(other_data)  # Join remaining parts as password data
-            self.name = name_data.decode()
-            self.password = password_data.decode()
-            return True
-        except ValueError as ve:
-            print(f'Registration Request Client: Failed parsing request. {ve}')
-            raise ve
 
 
-# code 1600, 1601
-class ClientRegistrationResponse:
-    def __init__(self):
-        self.header = ResponseHeader(EResponseCode.RESPONSE_REGISTRATION_OK.value)
-        self.client_id = b""
-
-    def pack(self):
-        try:
-            data = self.header.pack()
-            data += struct.pack(f"<{CLIENT_ID_SIZE}s", self.client_id)
-            return data
-        except:
-            return b""
 
 
-# code 1027
-class SymmetricKeyForClientRequest:
-    def __init__(self, request_header):
-        self.header = request_header
-        self.server_id = b""  # 16 bytes
-        self.nonce = b""  # 8 bytes
 
-    def unpack(self, data):
-        try:
-            null_terminator = b'\x00'
-            server_id_data, nonce_data = data.split(null_terminator, 1)
-            self.server_id = server_id_data
-            self.nonce = nonce_data
-            return True
-        except ValueError as ve:
-            print(f'Symmetric Key Request Client: Failed parsing request. {ve}')
-            raise ve
-
-
-# code 1603,
-class SymmetricKeyForClientResponse:
-    def __init__(self):
-        self.header = ResponseHeader(EResponseCode.RESPONSE_SYMMETRIC_KEY.value)
-        self.client_id = b""  # 16 bytes
-        self.encrypted_key = b""
-        self.ticket = b""
-
-    def pack(self):
-        try:
-            data = self.header.pack()
-            data += struct.pack(f"<{CLIENT_ID_SIZE}s", self.client_id)
-            data += self.encrypted_key
-            data += self.ticket
-            return data
-        except Exception as e:
-            print(f"Error packing SymmetricKeyResponseClient: {e}")
-            return b""
 
 
 #  code 1028

@@ -1,5 +1,4 @@
 import struct
-
 from utils import protocol
 from utils.encryption import encrypt_data
 from utils.protocol import EResponseCodeMsgService, ERequestCodeMsgService
