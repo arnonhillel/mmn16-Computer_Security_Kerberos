@@ -29,7 +29,6 @@ def encrypt_aes_key_and_nonce(aes_key, encryption_key, nonce):
     encrypted_nonce = cipher.encrypt(nonce)
     encrypted_aes_key = cipher.encrypt(aes_key)
     packed_data = iv + encrypted_nonce + encrypted_aes_key
-    print(f"encrypted_aes_key_for_client: {encrypted_aes_key}")
     return packed_data
 
 

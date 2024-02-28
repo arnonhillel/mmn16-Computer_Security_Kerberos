@@ -66,6 +66,7 @@ def handle_send_symmetric_key_request(data, request_header):
             'ticket': ticket,
             'authenticator': authenticator
         }
+        print(f"Accept symmetric key from client. client id: {request.header.client_id.hex()}")
         return response.pack()
     except ValueError as ve:
         print(f"Registration Request: {ve}")

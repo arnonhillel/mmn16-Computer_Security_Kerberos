@@ -20,7 +20,6 @@ class Ticket:
         creation_time_bytes = int(self.creation_time.timestamp()).to_bytes(8, byteorder='big')
         expiration_time = self.creation_time + timedelta(hours=1)
         expiration_time_bytes = int(expiration_time.timestamp()).to_bytes(8, byteorder='big')
-        print(f"AES_KEY {self.aes_key}")
         aes_and_expiration_bytes = self.aes_key + expiration_time_bytes
         encrypted_aes_and_expiration, ticket_iv = encrypt_data(aes_and_expiration_bytes,
                                                                base64_to_string(srv_info.key))
