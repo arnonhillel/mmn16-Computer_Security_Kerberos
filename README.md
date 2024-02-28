@@ -108,7 +108,7 @@ mmn16-/
 4. Attempts to decrypt a nonce received from the server using each encryption key derived from the hashed passwords.
 5. If the decrypted nonce matches the client-generated nonce, the corresponding password is considered found, and its hash is printed along with the password itself.
 
-##Note.
+## Note.
 This script is provided for educational and legitimate security testing purposes only. It is not intended for use in any illegal, unethical, or unauthorized activities. Unauthorized access to computer systems, networks, or data is illegal and unethical.
 
 By using this script, you agree to adhere to the principles of responsible and ethical use. The developers and contributors of this script are not liable for any misuse or unlawful activities conducted with this code.
