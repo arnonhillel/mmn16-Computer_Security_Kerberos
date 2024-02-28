@@ -1,8 +1,8 @@
 import socket
 import threading
+from message_service import handle_request
 
 from utils.protocol import CLIENT_ID_SIZE, VERSION_SIZE, CODE_SIZE, PAYLOAD_SIZE, RequestHeader
-from message_service import handle_request
 
 
 def get_port_from_file(file_path='port.info', default_port='1235'):

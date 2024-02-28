@@ -1,7 +1,8 @@
 import struct
+
 from utils import protocol
+from utils.protocol import ERequestCodeMsgService, EResponseCodeMsgService
 from utils.encryption import encrypt_data
-from utils.protocol import EResponseCodeMsgService, ERequestCodeMsgService
 
 
 def send_symmetric_key(connection, client_id, encrypted_authenticator_bytes, ticket_bytes):

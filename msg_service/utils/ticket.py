@@ -1,7 +1,4 @@
-from datetime import datetime, timedelta
-
 from utils.encryption import decrypt_data
-from utils.protocol import VERSION_SIZE
 
 
 class Ticket:
@@ -25,5 +22,4 @@ class Ticket:
         self.aes_key = decrypted_aes_and_expiration[:32]
         self.expiration_time = int.from_bytes(decrypted_aes_and_expiration[32:], byteorder='little')
 
-        # self.aes_key, self.expiration_time = derypted_aes_and_expiration
         return True
