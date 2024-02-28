@@ -112,4 +112,5 @@ mmn16-/
 This script is provided for educational and legitimate security testing purposes only. It is not intended for use in any illegal, unethical, or unauthorized activities. Unauthorized access to computer systems, networks, or data is illegal and unethical.
 
 By using this script, you agree to adhere to the principles of responsible and ethical use. The developers and contributors of this script are not liable for any misuse or unlawful activities conducted with this code.
+
 ![alt text](mmn16.png)
