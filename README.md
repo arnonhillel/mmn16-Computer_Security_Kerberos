@@ -74,6 +74,7 @@ mmn16-/
 |   |-- dict_attack.py
 |   |-- wordlist.txt
 |-- README.md
+|-- requirements.txt
 ```
 
 ## Running Services
