@@ -106,7 +106,7 @@ pip install -r requirements.txt
     python main.py
     ```
 
-### 4. Question 2
+### Question 2 - Dictionary Attack
 1. Loads a wordlist from a file specified as an argument to the load_words_and_hash function.
 2. Hashes each word in the wordlist using the SHA-256 hashing algorithm.
 3. Derives an encryption key from each hashed password using the PBKDF2 function.
