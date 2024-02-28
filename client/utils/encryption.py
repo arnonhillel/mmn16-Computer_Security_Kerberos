@@ -71,7 +71,7 @@ def decrypt_aes_key(iv, encrypted_nonce, encrypted_aes_key, encryption_key):
     cipher = AES.new(encryption_key, AES.MODE_CBC, iv=iv)
 
     # Decrypt the nonce and AES key
-    nonce = cipher.decrypt(encrypted_nonce)
+    nonce = unpad(cipher.decrypt(encrypted_nonce))
     aes_key = cipher.decrypt(encrypted_aes_key)
 
     return nonce, aes_key

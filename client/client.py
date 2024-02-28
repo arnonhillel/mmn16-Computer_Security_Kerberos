@@ -80,7 +80,8 @@ if __name__ == "__main__":
         name, password, client_id = register_or_load_data_from_me_info('me.info')
         """ ***** Request Symmetric Key From Auth to communicate with Message Service  *****"""
         decrypted_aes_key_client_msg, ticket_bytes = request_key_and_ticket(get_auth_connection(), client_id,
-                                                                    password.decode('utf-8').strip('\x00').strip("'"),
+                                                                            password.decode('utf-8').strip(
+                                                                                '\x00').strip("'"),
                                                                             server_id_bytes)
     except Exception as e:
         print(f"Error during communication with Authentication Service: {e}")
@@ -108,7 +109,8 @@ if __name__ == "__main__":
                             print('Exiting...')
                             break
                         is_message_sent = send_message_to_msg_server(get_msg_srv_connection(), client_id,
-                                                                     message.encode('utf-8'), decrypted_aes_key_client_msg)
+                                                                     message.encode('utf-8'),
+                                                                     decrypted_aes_key_client_msg)
                         if is_message_sent:
                             print('Message Sent successfully.')
                         else:

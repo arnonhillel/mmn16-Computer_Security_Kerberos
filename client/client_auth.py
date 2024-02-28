@@ -11,7 +11,7 @@ def generate_nonce():
 
 
 def register_client(connection, user_name, password):
-    request_header, request_payload = get_header_and_payload_for_register_client_request(user_name,password)
+    request_header, request_payload = get_header_and_payload_for_register_client_request(user_name, password)
     # Combine the header and payload
     request = request_header + request_payload
     connection.send_data(request)
@@ -44,7 +44,8 @@ def get_header_and_payload_for_register_client_request(user_name, password):
 
 def request_key_and_ticket(connection, client_id, password, server_id_bytes):
     try:
-        request_header, request_payload = get_header_and_payload_for_key_and_ticket_request(client_id, server_id_bytes)
+        request_header, request_payload, client_nonce = get_header_and_payload_for_key_and_ticket_request(client_id,
+                                                                                                          server_id_bytes)
         request_message = request_header + request_payload
         connection.send_data(request_message)
 
@@ -60,11 +61,12 @@ def request_key_and_ticket(connection, client_id, password, server_id_bytes):
                 # encrypted_key
                 encrypted_key_size = protocol.IV_SIZE + protocol.ENCRYPTED_NONCE_SIZE + protocol.AES_KEY_SIZE  # 16+16+32
                 encrypted_key_bytes = connection.receive_data(encrypted_key_size)
-                decrypted_aes_key_client_msg = get_decrypted_aes_key(encrypted_key_bytes, password)
+                decrypted_aes_key_client_msg, decrypted_nonce = get_decrypted_aes_key(encrypted_key_bytes, password, client_nonce)
                 # Ticket data
-                ticket_size = protocol.TICKET_SIZE  # 1 + 16 + 16 + 8 + 16 + 32 + 8 + 8(padding)
-                ticket_bytes = connection.receive_data(ticket_size)
-                return decrypted_aes_key_client_msg, ticket_bytes
+                if decrypted_aes_key_client_msg is not None:
+                    ticket_size = protocol.TICKET_SIZE  # 1 + 16 + 16 + 8 + 16 + 32 + 8 + 8(padding)
+                    ticket_bytes = connection.receive_data(ticket_size)
+                    return decrypted_aes_key_client_msg, ticket_bytes
         if res_code == EResponseCode.RESPONSE_REGISTRATION_ERROR.value:  # 1601:
             print(f"request key failed... client id: {client_id}")
     except Exception as e:
@@ -79,10 +81,10 @@ def get_header_and_payload_for_key_and_ticket_request(client_id, server_id_bytes
     request_payload = server_id_bytes + b'\0' + nonce
     payload_size = len(request_payload)
     request_header = struct.pack("<16sBHL", client_id, version, req_code, payload_size)
-    return request_header, request_payload
+    return request_header, request_payload, nonce
 
 
-def get_decrypted_aes_key(encrypted_key_bytes, password):
+def get_decrypted_aes_key(encrypted_key_bytes, password, client_nonce_to_validate):
     format_string = "16s16s32s"
     encrypted_iv, encrypted_nonce, encrypted_aes_key, = struct.unpack(format_string, encrypted_key_bytes)
     password_hash = hash_password(password)
@@ -90,4 +92,7 @@ def get_decrypted_aes_key(encrypted_key_bytes, password):
     decrypted_nonce, decrypted_aes_key = decrypt_aes_key(encrypted_iv, encrypted_nonce, encrypted_aes_key,
                                                          encryption_key)
     # TODO validate nonce
-    return decrypted_aes_key
+    if decrypted_nonce == client_nonce_to_validate:
+        return decrypted_aes_key, decrypted_nonce
+    else:
+        return None, None
