@@ -77,6 +77,10 @@ mmn16-/
 ```
 
 ## Running Services
+Before proceeding, ensure you have pip installed. You can install the required dependencies by running:
+```bash
+pip install -r requirements.txt
+```
 
 ### 1. auth_service
 1. Navigate to the `auth_service` directory.

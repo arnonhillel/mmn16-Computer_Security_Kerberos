@@ -69,8 +69,7 @@ def register_or_load_data_from_me_info(file_path):
         return None, None, None
 
 
-if __name__ == "__main__":
-
+def run_client():
     try:
         """
         Communication with Authentication Service
@@ -123,3 +122,7 @@ if __name__ == "__main__":
 
         except Exception as e:
             print(f"Error during communication with Message Service: {e}")
+
+
+if __name__ == "__main__":
+    run_client()
